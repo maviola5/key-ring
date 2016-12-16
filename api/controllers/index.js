@@ -24,10 +24,12 @@ module.exports.createKey = function(req, res){
 
 		var key = {};
 
+		var keyClone = new Key();
+
 		key.name = req.body.name || '';
 		key.url = req.body.url || '';
 		key.username = req.body.username || '';
-		key.password = req.body.password || '';
+		key.password = req.body.password ? keyClone.encryptPassword(req.body.password) : '';
 
 		ring.keys.push(key);
 
@@ -54,6 +56,13 @@ module.exports.getKeys = function(req, res){
 			});
 		}
 
+		var keyClone = new Key();
+
+
+		ring.keys.forEach(item => {
+			item.password = keyClone.decryptPassword(item.password);
+		});
+
 		return sendJSONresponse(res, 200, ring);
 	});
 };
@@ -76,7 +85,11 @@ module.exports.getKey = function(req, res){
 		// 	});
 		// }
 
+		var keyClone = new Key();
+
 		var key = ring.keys.id(req.params.keyId);
+
+		key.password = keyClone.decryptPassword(key.password);
 
 		if(key === null){
 			return sendJSONresponse(res, 404, {
@@ -112,10 +125,12 @@ module.exports.updateKey = function(req, res){
 			});
 		}
 
+		var keyClone = new Key();
+
 		key.name = req.body.name || key.name;
 		key.url = req.body.url || key.url;
 		key.username = req.body.username || key.username;
-		key.password = req.body.password || key.password;
+		key.password = req.body.password ? keyClone.encryptPassword(req.body.password) : key.password;
 
 		ring.save(function(err, ring){
 			if(err){
@@ -123,6 +138,11 @@ module.exports.updateKey = function(req, res){
 					"message": err.message
 				});
 			}
+
+			ring.keys.forEach(item => {
+				item.password = keyClone.decryptPassword(item.password);
+			});
+
 			return sendJSONresponse(res, 200, ring);
 		});
 
@@ -161,7 +181,7 @@ module.exports.deleteKey = function(req, res){
 	})
 };
 
-// var scraps = require('../models/scrap');
+// var scraps = require('../models/scraps');
 
 // module.exports.bulk = function(req, res){
 
@@ -172,8 +192,18 @@ module.exports.deleteKey = function(req, res){
 // 			});
 // 		}
 
+// 		ring.keys = [];
+
 // 		ring.keys = ring.keys.concat(scraps.applications);
+
+// 		var keyClone = new Key();
+
+// 		ring.keys.forEach(item => {
+// 			item.password = keyClone.encryptPassword(item.password);
+// 		});
+
 // 		console.log(scraps.applications);
+
 // 		ring.save(function(err, ring){
 // 			if(err){
 // 				return sendJSONresponse(res, 400, {

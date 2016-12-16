@@ -44,7 +44,7 @@ router.delete('/key/:keyId', auth, ctrlApp.deleteKey);
 router.post('/register', ctrlAuth.register);
 router.post('/login', ctrlAuth.login);
 
-router.get('/bulkjob', auth, ctrlApp.bulk);
+// router.get('/bulkjob', auth, ctrlApp.bulk);
 
 //404 Error catch
 router.all('*', notFound);

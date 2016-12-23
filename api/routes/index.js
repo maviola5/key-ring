@@ -1,6 +1,9 @@
 var express = require('express');
 var router = express.Router();
 var jwt = require('jsonwebtoken');
+var cryptoHelper = require('../config/cryptoHelper');
+var email = require('../controllers/email');
+
 
 var sendJsonResponse = function(res, status, content){
 	res.status(status);
@@ -9,16 +12,23 @@ var sendJsonResponse = function(res, status, content){
 
 var auth = function(req, res, next){
 	if(!req.headers.authorization){
+		req.session.destroy();
 		return sendJsonResponse(res, 401, {"message": "Authorization is required" });
 	}
 
 	var token = req.headers.authorization.replace('Bearer ', '');
 	jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
 		if(err){
-			valid = false;
+			req.session.destroy();
 			return sendJsonResponse(res, 401, {"message": err });
 		}
-		valid = true;
+
+		//check if token is in session
+		if(cryptoHelper.encryptPassword(token) !== req.session.token){
+			req.session.destroy();
+			return sendJsonResponse(res, 401, {"message": "Authorization is required"})
+		}
+		
 		res.locals.user = decoded;
 		next();
 	});
@@ -43,6 +53,37 @@ router.delete('/key/:keyId', auth, ctrlApp.deleteKey);
 //auth api
 router.post('/register', ctrlAuth.register);
 router.post('/login', ctrlAuth.login);
+
+//TODO: split the route with userid out to admin routes
+router.get('/logout/:userid', ctrlAuth.logout);
+
+
+/**
+* BIG TODO: determine simple admin routes
+*/
+//admin routes
+
+//make reset password route
+//make onboarding route
+//make admin user-dashboard
+router.get('/emailtest', (req, res) => {
+	// res.send('hello');
+	var mailOptions = {
+		from: '"Fred Foo" <foo@blurdybloop.com>',
+		to: 'maviola5@gmail.com',
+		subject: 'Hello'
+	}
+
+	email.sendMail(mailOptions, (error, info) => {
+		if(error){
+			console.log(error);
+			return sendJsonResponse(res, 400, error);
+		}
+		sendJsonResponse(res, 200, {
+			"message": info.response
+		});
+	});
+})
 
 // router.get('/bulkjob', auth, ctrlApp.bulk);
 

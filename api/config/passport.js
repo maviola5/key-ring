@@ -8,6 +8,7 @@ passport.use(new LocalStrategy({
 }, function(username, password, done){
 	User.findOne({ email: username }, function(err, user){
 		if(err){
+			console.log('jhere');
 			return done(err);
 		}
 		if(!user){
@@ -20,6 +21,8 @@ passport.use(new LocalStrategy({
 				"message": "Incorrect password"
 			});
 		}
+		// res.locals.user = user;
+		// console.log();
 		return done(null, user);
 	})
 }));

@@ -9,6 +9,8 @@ var sendJSONresponse = function(res, status, content){
 
 var errMessage = "Something went wrong"
 
+var getUser = function(){};
+
 module.exports.createKey = function(req, res){
 	if(!req.body.name){
 		return sendJSONresponse(res, 400, {

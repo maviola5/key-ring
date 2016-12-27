@@ -12,6 +12,10 @@ var userSchema = new mongoose.Schema({
 		type: String,
 		required: true
 	},
+	role: {
+		type: String,
+		"default": "common" //admin, etc. to be determined
+	},
 	hash: String,
 	salt: String
 });

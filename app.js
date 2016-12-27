@@ -7,37 +7,14 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var helmet = require('helmet');
 var cors = require('cors');
-var session = require('express-session');
-var RedisStore = require('connect-redis')(session);
-
 
 require('./api/models/db');
+require('./api/models/redisClient');
 require('./api/config/passport');
 
 var api = require('./api/routes/index');
 
 var app = express();
-
-var sessionOptions = {
-  host: 'localhost',
-  port: '6379',
-  // db: 2,
-  ttl: (20 * 60)
-}
-
-app.use(session({
-  store: new RedisStore(sessionOptions),
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: true,
-  key: 'id',
-  cookie: {
-    domain: 'localhost',
-    // secure: true,
-    httpOnly: true,
-    maxAge: null
-  }
-}));
 
 // uncomment after placing your favicon in /public
 // app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -66,7 +43,6 @@ app.use(express.static(path.join(__dirname, 'app')));
 */
 app.use(function(req, res, next){
   // console.log(req.query);
-  // console.log(req.session);
   // console.log(req.body);
   // req.session.key = 'bar';
   next();

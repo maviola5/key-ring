@@ -24,14 +24,14 @@ module.exports.createKey = function(req, res){
 			});
 		}
 
-		var key = {};
-
-		var keyClone = new Key();
+		var key = new Key();
 
 		key.name = req.body.name || '';
 		key.url = req.body.url || '';
 		key.username = req.body.username || '';
-		key.password = req.body.password ? keyClone.encryptPassword(req.body.password) : '';
+		key.hash = req.body.password ? key.encryptPassword(req.body.password) : '';
+		console.log(req.body.password);
+		console.log(key.encryptPassword(req.body.password));
 
 		ring.keys.push(key);
 
@@ -58,11 +58,10 @@ module.exports.getKeys = function(req, res){
 			});
 		}
 
-		var keyClone = new Key();
-
+		var key = new Key();
 
 		ring.keys.forEach(item => {
-			item.password = keyClone.decryptPassword(item.password);
+			item.hash = key.decryptPassword(item.hash, item.salt);
 		});
 
 		return sendJSONresponse(res, 200, ring);

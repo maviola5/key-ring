@@ -40,7 +40,6 @@ module.exports.register = function(req, res){
 				"message": err.message
 			});
 		}
-
 		token = user.generateJwt();
 		//set user hash in Redis
 		redisClient.set(user.email, encryptToken(token), function(err, reply){
@@ -115,7 +114,10 @@ module.exports.resetEmail = function(req, res){
 				"message": err
 			});
 		}
-		var token = user.generateJwt();
+		var token = user.generateJwt({
+			minutes: 3,
+			days: 0
+		});
 		//todo: refactor this code
 		var mailOptions = {
 			from: '"Key Ring" <tviola202@gmail.com>',

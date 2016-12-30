@@ -30,10 +30,21 @@ userSchema.methods.validPassword = function(password){
 	return this.hash === hash;
 };
 
-userSchema.methods.generateJwt = function(){
+userSchema.methods.generateJwt = function(options){
+	var expiration = {};
 	var expiry = new Date();
-	expiry.setDate(expiry.getDate() + 7);
-
+	if(!options){
+		expiration.minutes = 0,
+		expiration.days = 7
+	} else {
+		expiration.minutes = options.minutes || 0,
+		expiration.days = options.days || 0
+	}
+	console.log(expiration);
+	console.log(typeof expiration.minutes)
+	expiry.setDate(expiry.getDate() + expiration.days);
+	expiry.setMinutes(expiry.getMinutes() + expiration.minutes);
+	console.log(typeof parseInt(expiry.getTime() / 1000));
 	return jwt.sign({
 		_id: this._id,
 		email: this.email,

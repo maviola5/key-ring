@@ -29,6 +29,7 @@ router.post('/login', ctrlAuth.login);
 router.get('/logout', routeGuard, ctrlAuth.logout);
 router.post('/resetemail', ctrlAuth.resetEmail);
 router.post('/setpassword', routeGuard, ctrlAuth.setPassword);
+
 /**
 * BIG TODO: determine simple admin routes
 */
